@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+
+{% block sub_content %}
+<div class="container-fluid py-4">
+    <!-- Заголовок с градиентом -->
+    <div class="text-center mb-5">
+        <h2 class="display-4 fw-bold bg-gradient text-primary mb-3">
+            Привет, {{name}}! 🌸
+        </h2>
+        <p class="lead text-muted">Результаты классификации ваших ирисов</p>
+    </div>
+
+    {% if irises %}
+        <div class="row g-4">
+            {% for iris in irises %}
+                <div class="col-12">
+                    <!-- Карточка с тенью и анимацией -->
+                    <div class="card shadow-lg border-0 h-100 iris-card">
+                        <div class="card-header bg-gradient-primary text-white py-3">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h4 class="mb-0 fw-bold">
+                                        <i class="fas fa-seedling me-2"></i>
+                                        Предсказанный сорт: {{ iris.prediction }}
+                                    </h4>
+                                </div>
+                                <div class="col-auto">
+                                    <span class="badge bg-light text-primary fs-6 px-3 py-2">
+                                        ID: {{ iris.id }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body p-4">
+                            <!-- Параметры ириса в красивой сетке -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="feature-box text-center p-3 rounded-3 bg-light">
+                                        <div class="feature-icon mb-2">
+                                            <i class="fas fa-ruler text-success fs-4"></i>
+                                        </div>
+                                        <h6 class="text-muted mb-1">Длина чашелистика</h6>
+                                        <h4 class="text-success fw-bold">{{ iris.sepal_length }}</h4>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="feature-box text-center p-3 rounded-3 bg-light">
+                                        <div class="feature-icon mb-2">
+                                            <i class="fas fa-arrows-alt-h text-info fs-4"></i>
+                                        </div>
+                                        <h6 class="text-muted mb-1">Ширина чашелистика</h6>
+                                        <h4 class="text-info fw-bold">{{ iris.sepal_width }}</h4>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="feature-box text-center p-3 rounded-3 bg-light">
+                                        <div class="feature-icon mb-2">
+                                            <i class="fas fa-ruler-vertical text-warning fs-4"></i>
+                                        </div>
+                                        <h6 class="text-muted mb-1">Длина лепестка</h6>
+                                        <h4 class="text-warning fw-bold">{{ iris.petal_length }}</h4>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="feature-box text-center p-3 rounded-3 bg-light">
+                                        <div class="feature-icon mb-2">
+                                            <i class="fas fa-expand-arrows-alt text-danger fs-4"></i>
+                                        </div>
+                                        <h6 class="text-muted mb-1">Ширина лепестка</h6>
+                                        <h4 class="text-danger fw-bold">{{ iris.petal_width }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Статус предсказания -->
+                            <div class="row justify-content-center">
+                                <div class="col-auto">
+                                    {% if iris.real %}
+                                        {% if iris.prediction == iris.real %}
+                                            <div class="alert alert-success border-0 shadow-sm d-flex align-items-center">
+                                                <i class="fas fa-check-circle fs-4 me-3"></i>
+                                                <div>
+                                                    <h5 class="mb-0 fw-bold">Предсказание оказалось верным!</h5>
+                                                    <small class="text-muted">Модель успешно определила сорт</small>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <div class="alert alert-danger border-0 shadow-sm d-flex align-items-center">
+                                                <i class="fas fa-times-circle fs-4 me-3"></i>
+                                                <div>
+                                                    <h5 class="mb-0 fw-bold">Предсказание оказалось ложным</h5>
+                                                    <small class="text-muted">Модель ошиблась в определении сорта</small>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="d-flex gap-3 justify-content-center">
+                                            <a href="/prediction_true/{{ iris.id }}"
+                                               class="btn btn-success btn-lg px-4 py-3 rounded-pill shadow-sm">
+                                                <i class="fas fa-thumbs-up me-2"></i>
+                                                Предсказание верно
+                                            </a>
+                                            <a href="/prediction_false/{{ iris.id }}"
+                                               class="btn btn-outline-danger btn-lg px-4 py-3 rounded-pill shadow-sm">
+                                                <i class="fas fa-thumbs-down me-2"></i>
+                                                Предсказание неверно
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Пустое состояние -->
+        <div class="text-center py-5">
+            <div class="empty-state">
+                <i class="fas fa-seedling text-muted mb-4" style="font-size: 5rem; opacity: 0.3;"></i>
+                <h3 class="text-muted mb-3">У вас еще нет добавленных ирисов</h3>
+                <p class="text-muted mb-4">Добавьте ваш первый ирис для начала классификации</p>
+                <a href="#" class="btn btn-primary btn-lg rounded-pill px-4">
+                    <i class="fas fa-plus me-2"></i>
+                    Добавить ирис
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .iris-card {
+        transition: all 0.3s ease;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .iris-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .feature-box {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .feature-box:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .btn {
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .empty-state {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+        .display-4 {
+            font-size: 2rem;
+        }
+
+        .btn-lg {
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}

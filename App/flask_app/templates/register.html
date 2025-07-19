@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block sub_content %}
+<div class="text-center">
+    <h1>Регистрация пользователя</h1>
+</div>
+
+<form method="POST">
+  <div class="mb-3">
+    <label for="first_name" class="form-label">Имя</label>
+    <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Введите ваше имя" required>
+  </div>
+  <div class="mb-3">
+    <label for="last_name" class="form-label">Фамилия</label>
+    <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Введите вашу фамилию">
+  </div>
+  <div class="mb-3">
+    <label for="user_name" class="form-label">Логин</label>
+    <input type="text" class="form-control" id="user_name" name="user_name"  placeholder="Придумайте логин (будет использоваться для авторизации)" required>
+  </div>
+  <div class="mb-3">
+    <label for="email" class="form-label">Почта</label>
+    <input type="email" class="form-control" id="email" name="email" placeholder="Введите вашу почту" aria-describedby="emailHelp" required>
+  </div>
+  <div class="mb-3">
+    <label for="password" class="form-label">Пароль</label>
+    <input type="password" class="form-control" id="password" name="password" placeholder="Придумайте пароль" required>
+  </div>  <div class="mb-3">
+    <label for="confirm_password" class="form-label">Подтвердите пароль</label>
+    <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Повторите пароль" required>
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}

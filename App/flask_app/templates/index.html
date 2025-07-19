@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+
+{% block sub_content %}
+<div class="container-fluid py-4">
+    <!-- Заголовок с градиентом -->
+    <div class="text-center mb-5">
+        <h2 class="display-4 fw-bold bg-gradient text-primary mb-3">
+            Сайт по предсказанию сортов Ирисов при помощи ML модели 🌸
+        </h2>
+        <p class="lead text-muted">Статистика классификации ирисов за все время</p>
+    </div>
+
+    <!-- Общая статистика -->
+    {% if all_irises %}
+        <!-- Карточки со статистикой -->
+        <div class="row g-4 mb-5">
+            <!-- Общее количество предсказаний -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card stats-card bg-primary text-white border-0 shadow-lg">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white-50 text-uppercase fw-bold">Всего предсказаний</h6>
+                                <h2 class="fw-bold mb-0">{{ all_irises|length }}</h2>
+                            </div>
+                            <div class="stats-icon">
+                                <i class="fas fa-seedling fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Точность модели -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card stats-card bg-success text-white border-0 shadow-lg">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white-50 text-uppercase fw-bold">Точность модели</h6>
+                                {% set verified = all_irises|selectattr("real")|list %}
+                                {% set correct = [] %}
+                                {% for iris in verified %}
+                                    {% if iris.prediction == iris.real %}
+                                        {% set _ = correct.append(iris) %}
+                                    {% endif %}
+                                {% endfor %}
+                                {% if verified|length > 0 %}
+                                    <h2 class="fw-bold mb-0">{{ "%.1f"|format((correct|length / verified|length * 100)) }}%</h2>
+                                {% else %}
+                                    <h2 class="fw-bold mb-0">N/A</h2>
+                                {% endif %}
+                            </div>
+                            <div class="stats-icon">
+                                <i class="fas fa-bullseye fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Верные предсказания -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card stats-card bg-info text-white border-0 shadow-lg">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white-50 text-uppercase fw-bold">Верные</h6>
+                                {% set verified = all_irises|selectattr("real")|list %}
+                                {% set correct = [] %}
+                                {% for iris in verified %}
+                                    {% if iris.prediction == iris.real %}
+                                        {% set _ = correct.append(iris) %}
+                                    {% endif %}
+                                {% endfor %}
+                                <h2 class="fw-bold mb-0">{{ correct|length }}</h2>
+                            </div>
+                            <div class="stats-icon">
+                                <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Неверные предсказания -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card stats-card bg-warning text-white border-0 shadow-lg">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white-50 text-uppercase fw-bold">Неверные</h6>
+                                {% set verified = all_irises|selectattr("real")|list %}
+                                {% set correct = [] %}
+                                {% for iris in verified %}
+                                    {% if iris.prediction == iris.real %}
+                                        {% set _ = correct.append(iris) %}
+                                    {% endif %}
+                                {% endfor %}
+                                <h2 class="fw-bold mb-0">{{ verified|length - correct|length }}</h2>
+                            </div>
+                            <div class="stats-icon">
+                                <i class="fas fa-times-circle fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Детальная статистика по сортам -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-header bg-gradient-primary text-white py-3">
+                        <h4 class="mb-0 fw-bold">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Статистика по сортам
+                        </h4>
+                    </div>
+                    <div class="card-body p-4">
+                        {% set species_stats = {} %}
+                        {% for iris in all_irises %}
+                            {% if iris.prediction not in species_stats %}
+                                {% set _ = species_stats.update({iris.prediction: {'total': 0, 'correct': 0, 'verified': 0}}) %}
+                            {% endif %}
+                            {% set _ = species_stats[iris.prediction].update({'total': species_stats[iris.prediction]['total'] + 1}) %}
+                            {% if iris.real %}
+                                {% set _ = species_stats[iris.prediction].update({'verified': species_stats[iris.prediction]['verified'] + 1}) %}
+                                {% if iris.prediction == iris.real %}
+                                    {% set _ = species_stats[iris.prediction].update({'correct': species_stats[iris.prediction]['correct'] + 1}) %}
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+                        <div class="row g-4">
+                            {% for species, stats in species_stats.items() %}
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="species-card p-4 rounded-3 bg-light border">
+                                        <div class="text-center mb-3">
+                                            <h5 class="fw-bold text-primary mb-2">{{ species }}</h5>
+                                            <div class="species-icon mb-3">
+                                                <i class="fas fa-flower text-primary" style="font-size: 2.5rem;"></i>
+                                            </div>
+                                        </div>
+
+                                        <div class="stats-grid">
+                                            <div class="stat-item d-flex justify-content-between mb-2">
+                                                <span class="text-muted">Всего предсказаний:</span>
+                                                <span class="fw-bold">{{ stats.total }}</span>
+                                            </div>
+                                            <div class="stat-item d-flex justify-content-between mb-2">
+                                                <span class="text-muted">Проверено:</span>
+                                                <span class="fw-bold">{{ stats.verified }}</span>
+                                            </div>
+                                            <div class="stat-item d-flex justify-content-between mb-3">
+                                                <span class="text-muted">Верных:</span>
+                                                <span class="fw-bold text-success">{{ stats.correct }}</span>
+                                            </div>
+
+                                            {% if stats.verified > 0 %}
+                                                <div class="accuracy-bar">
+                                                    <div class="d-flex justify-content-between mb-1">
+                                                        <small class="text-muted">Точность</small>
+                                                        <small class="fw-bold">{{ "%.1f"|format((stats.correct / stats.verified * 100)) }}%</small>
+                                                    </div>
+                                                    <div class="progress" style="height: 8px;">
+                                                        <div class="progress-bar bg-success"
+                                                             style="width: {{ (stats.correct / stats.verified * 100) }}%"></div>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <div class="text-center">
+                                                    <small class="text-muted">Нет проверенных данных</small>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    {% else %}
+        <!-- Пустое состояние -->
+        <div class="text-center py-5">
+            <div class="empty-state">
+                <i class="fas fa-seedling text-muted mb-4" style="font-size: 5rem; opacity: 0.3;"></i>
+                <h3 class="text-muted mb-3">Пока нет данных для анализа</h3>
+                <p class="text-muted mb-4">Добавьте первые ирисы для начала сбора статистики</p>
+                <a href="#" class="btn btn-primary btn-lg rounded-pill px-4">
+                    <i class="fas fa-plus me-2"></i>
+                    Добавить первый ирис
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .stats-card {
+        transition: all 0.3s ease;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2) !important;
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .species-card {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.1) !important;
+    }
+
+    .species-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .progress {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        border-radius: 10px;
+        transition: width 0.6s ease;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0,0,0,0.02);
+    }
+
+    .empty-state {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+        .display-4 {
+            font-size: 2rem;
+        }
+
+        .stats-card .card-body {
+            padding: 1.5rem !important;
+        }
+
+        .species-card {
+            padding: 2rem !important;
+        }
+    }
+</style>
+{% endblock %}

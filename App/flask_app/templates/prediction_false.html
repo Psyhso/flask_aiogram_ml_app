@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block sub_content %}
+<div class="text-center">
+    <h1>Предсказание сорта Ириса</h1>
+</div>
+
+<h4>Жаль, что модель не справилась. Укажите сорт Ириса, мы используем эти данные для улучшения качества предсказаний</h4>
+
+<form method="POST">
+  <div class="row">
+    <div class="col">
+      <label for="true_sort" class="form-label">Сорт Ириса</label>
+      <input type="text" class="form-control" id="true_sort" name="true_sort" required>
+    </div>
+  </div>>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}
